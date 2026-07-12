@@ -13,10 +13,12 @@ public sealed class PlcDevice : ObservableObject
     private string _lastUpdated = "--";
     private PointCollection _trendPoints = new();
 
+    private string _ipAddress;
+
     public PlcDevice(string name, string ipAddress, bool isOnline, double temperature, double pressure)
     {
         Name = name;
-        IpAddress = ipAddress;
+        _ipAddress = ipAddress;
         IsOnline = isOnline;
         Temperature = temperature;
         Pressure = pressure;
@@ -24,7 +26,7 @@ public sealed class PlcDevice : ObservableObject
     }
 
     public string Name { get; }
-    public string IpAddress { get; }
+    public string IpAddress { get => _ipAddress; set => SetProperty(ref _ipAddress, value); }
 
     public bool IsOnline
     {
