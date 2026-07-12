@@ -30,6 +30,15 @@
       <Setter Property="Cursor" Value="Hand" />
     </Style>
 
+    <Style TargetType="{x:Type TextBox}">
+      <Setter Property="Background" Value="#101827" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+      <Setter Property="BorderBrush" Value="{StaticResource PanelBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="8,5" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
     <Style TargetType="{x:Type ListBoxItem}">
       <Setter Property="Padding" Value="0" />
       <Setter Property="Margin" Value="0,0,0,8" />
