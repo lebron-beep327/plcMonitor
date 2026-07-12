@@ -1,0 +1,18 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlcMonitorWpf", "PlcMonitorWpf\PlcMonitorWpf.csproj", "{9DA8A390-70FB-44D9-94E5-D0CBE814D14E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9DA8A390-70FB-44D9-94E5-D0CBE814D14E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA8A390-70FB-44D9-94E5-D0CBE814D14E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA8A390-70FB-44D9-94E5-D0CBE814D14E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA8A390-70FB-44D9-94E5-D0CBE814D14E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
