@@ -1,171 +1,187 @@
 <Window x:Class="PlcMonitorWpf.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PLC 监控" Height="760" Width="1320" MinHeight="600" MinWidth="1000"
+        Title="车辆作业监控平台" Height="800" Width="1440" MinHeight="650" MinWidth="1080"
         Background="{StaticResource PageBackground}" Foreground="{StaticResource TextPrimary}"
         FontFamily="Microsoft YaHei UI" WindowStartupLocation="CenterScreen">
   <Grid Margin="20">
     <Grid.RowDefinitions>
-      <RowDefinition Height="62" />
+      <RowDefinition Height="70" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <Grid Grid.Row="0">
+    <!-- 顶部：系统名称与连接设置 -->
+    <Grid>
       <StackPanel VerticalAlignment="Center">
-        <TextBlock Text="PLC 设备监控" FontSize="25" FontWeight="SemiBold" />
-        <TextBlock Text="简洁版 · 实时状态与报警" Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0" />
+        <TextBlock Text="车辆作业监控平台" FontSize="26" FontWeight="SemiBold" />
+        <TextBlock Text="PLC 状态 · 视频监控 · 数据库看板" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0" />
       </StackPanel>
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
         <Ellipse Width="10" Height="10" Fill="{StaticResource Success}" VerticalAlignment="Center" Margin="0,0,8,0" />
         <TextBlock Text="系统运行中" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
-        <TextBlock Text="{Binding CurrentTime}" Margin="24,0,0,0" VerticalAlignment="Center" />
+        <TextBlock Text="PLC IP" Foreground="{StaticResource TextSecondary}" Margin="22,0,7,0" VerticalAlignment="Center" />
+        <TextBox Width="122" Text="{Binding SelectedPlc.IpAddress, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Content="保存" Command="{Binding SavePlcIpCommand}" Padding="10,5" Margin="6,0,0,0" />
+        <TextBlock Text="相机 IP" Foreground="{StaticResource TextSecondary}" Margin="14,0,7,0" VerticalAlignment="Center" />
+        <TextBox Width="122" Text="{Binding CameraIp, UpdateSourceTrigger=PropertyChanged}" />
+        <Button Content="保存" Command="{Binding SaveCameraIpCommand}" Padding="10,5" Margin="6,0,0,0" />
+        <TextBlock Text="{Binding CurrentTime}" Margin="18,0,0,0" VerticalAlignment="Center" />
       </StackPanel>
     </Grid>
 
     <Grid Grid.Row="1">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="250" />
+        <ColumnDefinition Width="276" />
         <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="300" />
+        <ColumnDefinition Width="330" />
       </Grid.ColumnDefinitions>
 
-      <!-- 左：PLC 列表 -->
-      <Border Grid.Column="0" Style="{StaticResource Panel}" Margin="0,0,14,0">
-        <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-          </Grid.RowDefinitions>
-          <TextBlock Text="PLC 列表" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,15" />
-          <ListBox Grid.Row="1" ItemsSource="{Binding PlcDevices}" SelectedItem="{Binding SelectedPlc, Mode=TwoWay}" BorderThickness="0" Background="Transparent">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <Border Padding="12,10">
-                  <Grid>
-                    <Grid.ColumnDefinitions>
-                      <ColumnDefinition Width="12" />
-                      <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Ellipse Width="9" Height="9" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                      <TextBlock Text="{Binding IpAddress}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0" />
-                      <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="{Binding StatusBrush}" Margin="0,4,0,0" />
-                    </StackPanel>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </Grid>
-      </Border>
-
-      <!-- 中：当前 PLC 摄像头画面 -->
-      <Grid Grid.Column="1" Margin="0,0,14,0">
+      <!-- 左：PLC 数据与 SQL 柱状图 -->
+      <Grid Grid.Column="0" Margin="0,0,14,0">
         <Grid.RowDefinitions>
-          <RowDefinition Height="Auto" />
+          <RowDefinition Height="310" />
           <RowDefinition Height="*" />
-          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <Border Style="{StaticResource Panel}" Padding="18,14" Margin="0,0,0,14">
+        <Border Style="{StaticResource Panel}">
           <Grid>
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <StackPanel>
-              <TextBlock Text="{Binding SelectedPlc.Name}" FontSize="20" FontWeight="SemiBold" />
-              <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
-                <TextBlock Text="PLC IP：" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
-                <TextBox Width="145" Text="{Binding SelectedPlc.IpAddress, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Content="保存" Command="{Binding SavePlcIpCommand}" Padding="10,5" Margin="8,0,0,0" />
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+            <DockPanel Margin="0,0,0,14">
+              <StackPanel>
+                <TextBlock Text="PLC 信号状态" FontSize="18" FontWeight="SemiBold" />
+                <TextBlock Text="1756-L71 · EtherNet/IP" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0" />
               </StackPanel>
-            </StackPanel>
-            <Border Grid.Column="1" Background="{Binding SelectedPlc.StatusBrush}" CornerRadius="14" Padding="12,5" VerticalAlignment="Center">
-              <TextBlock Text="{Binding SelectedPlc.StatusText}" Foreground="White" FontWeight="SemiBold" />
-            </Border>
-          </Grid>
-        </Border>
-
-        <Border Grid.Row="1" Style="{StaticResource Panel}">
-          <Grid>
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="*" />
-              <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <DockPanel>
-              <TextBlock Text="实时视频" FontSize="17" FontWeight="SemiBold" />
-              <Border DockPanel.Dock="Right" Background="#31445E" CornerRadius="12" Padding="10,4">
-                <TextBlock Text="摄像头未连接" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+              <Border DockPanel.Dock="Right" Background="#1B423B" CornerRadius="12" Padding="10,4" VerticalAlignment="Center">
+                <TextBlock Text="已连接" Foreground="{StaticResource Success}" FontSize="12" />
               </Border>
             </DockPanel>
-            <Border Grid.Row="1" Background="#080E17" BorderBrush="#2A405D" BorderThickness="1" CornerRadius="6" Margin="0,18,0,18">
-              <Grid>
-                <Border Width="76" Height="76" CornerRadius="38" Background="#13283A" HorizontalAlignment="Center" VerticalAlignment="Center">
-                  <TextBlock Text="CAM" Foreground="{StaticResource Primary}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,124,0,0">
-                  <TextBlock Text="等待摄像头接入" HorizontalAlignment="Center" FontSize="18" FontWeight="SemiBold" />
-                  <TextBlock Text="接入后将在此显示实时画面" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0" />
-                </StackPanel>
-                <Border Background="#172235" CornerRadius="4" Padding="9,5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12">
-                  <TextBlock Text="通道 01" Foreground="{StaticResource TextSecondary}" FontSize="12" />
-                </Border>
-              </Grid>
-            </Border>
-            <DockPanel Grid.Row="2">
-              <TextBlock Text="摄像头 IP：" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
-              <TextBox Width="155" Text="{Binding CameraIp, UpdateSourceTrigger=PropertyChanged}" />
-              <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
-                <Button Content="保存摄像头 IP" Command="{Binding SaveCameraIpCommand}" />
-                <Button Content="开始预览" Background="#58677B" BorderBrush="#718096" Margin="0" />
-              </StackPanel>
-            </DockPanel>
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding PlcSignals}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="#1C2C43" CornerRadius="6" Padding="11,9" Margin="0,0,0,8">
+                    <Grid>
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="12" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                      <Ellipse Width="9" Height="9" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="1" Margin="9,0,0,0">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding SignalType}" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding Value}" Foreground="{Binding StatusBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </Grid>
         </Border>
 
-        <Border Grid.Row="2" Style="{StaticResource Panel}" Margin="0,14,0,0" Padding="16,12">
+        <Border Grid.Row="1" Style="{StaticResource Panel}" Margin="0,14,0,0">
           <Grid>
-            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-            <TextBlock Text="提示：" Foreground="{StaticResource TextSecondary}" />
-            <TextBlock Grid.Column="1" Text="摄像头接入功能将在确定型号和视频协议后启用。" FontWeight="SemiBold" />
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <TextBlock Text="产量趋势" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Grid.Row="0" Text="SQL 数据" HorizontalAlignment="Right" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+            <Grid Grid.Row="1" Margin="0,20,0,8">
+              <Border Background="#38506E" Height="1" VerticalAlignment="Bottom" />
+              <ItemsControl ItemsSource="{Binding SqlChartBars}" VerticalAlignment="Bottom">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Width="36" Margin="3,0" VerticalAlignment="Bottom">
+                      <TextBlock Text="{Binding ValueText}" FontSize="11" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" />
+                      <Border Height="{Binding BarHeight}" Background="{StaticResource Primary}" CornerRadius="3,3,0,0" Margin="5,5,5,0" />
+                      <TextBlock Text="{Binding Label}" FontSize="10" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+            <TextBlock Grid.Row="2" Text="本班次小时产量（示例）" Foreground="{StaticResource TextSecondary}" FontSize="12" />
           </Grid>
         </Border>
       </Grid>
 
-      <!-- 右：报警和趋势 -->
+      <!-- 中：摄像头和当前作业状态 -->
+      <Grid Grid.Column="1" Margin="0,0,14,0">
+        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="150" /></Grid.RowDefinitions>
+        <Border Style="{StaticResource Panel}">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <DockPanel Margin="0,0,0,14">
+              <TextBlock Text="实时摄像头" FontSize="18" FontWeight="SemiBold" />
+              <Border DockPanel.Dock="Right" Background="#31445E" CornerRadius="12" Padding="10,4">
+                <TextBlock Text="通道 01 · 等待接入" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+              </Border>
+            </DockPanel>
+            <Border Grid.Row="1" Background="#080E17" BorderBrush="#2A405D" BorderThickness="1" CornerRadius="7">
+              <Grid>
+                <Border Width="82" Height="82" CornerRadius="41" Background="#13283A" HorizontalAlignment="Center" VerticalAlignment="Center">
+                  <TextBlock Text="CAM" Foreground="{StaticResource Primary}" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,132,0,0">
+                  <TextBlock Text="摄像头画面区域" HorizontalAlignment="Center" FontSize="19" FontWeight="SemiBold" />
+                  <TextBlock Text="视频流接入后将自动显示" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <TextBlock Grid.Row="2" Text="视频接口预留：网络相机 RTSP / USB 摄像头" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,13,0,0" />
+          </Grid>
+        </Border>
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,14,0,0">
+          <Border Style="{StaticResource Panel}" Margin="0,0,9,0" Padding="15">
+            <StackPanel><TextBlock Text="当前车号" Foreground="{StaticResource TextSecondary}" /><TextBlock Text="{Binding CurrentVehicleNumber}" FontSize="20" FontWeight="SemiBold" Margin="0,12,0,0" /></StackPanel>
+          </Border>
+          <Border Style="{StaticResource Panel}" Margin="0,0,9,0" Padding="15">
+            <StackPanel><TextBlock Text="当前状态" Foreground="{StaticResource TextSecondary}" /><TextBlock Text="{Binding CurrentWorkStatus}" Foreground="{StaticResource Primary}" FontSize="20" FontWeight="SemiBold" Margin="0,12,0,0" /></StackPanel>
+          </Border>
+          <Border Style="{StaticResource Panel}" Padding="15">
+            <StackPanel><TextBlock Text="设备状态" Foreground="{StaticResource TextSecondary}" /><TextBlock Text="{Binding EquipmentStatus}" Foreground="{StaticResource Success}" FontSize="20" FontWeight="SemiBold" Margin="0,12,0,0" /></StackPanel>
+          </Border>
+        </UniformGrid>
+      </Grid>
+
+      <!-- 右：SQL 统计和表格查询 -->
       <Grid Grid.Column="2">
-        <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="180" /></Grid.RowDefinitions>
-        <Border Style="{StaticResource Panel}" Margin="0,0,0,14">
+        <Grid.RowDefinitions><RowDefinition Height="205" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+        <Border Style="{StaticResource Panel}">
           <Grid>
             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-            <DockPanel Margin="0,0,0,14">
-              <TextBlock Text="报警信息" FontSize="17" FontWeight="SemiBold" />
-              <TextBlock Text="{Binding AlarmCount, StringFormat=共 {0} 条}" DockPanel.Dock="Right" Foreground="{StaticResource TextSecondary}" />
-            </DockPanel>
-            <ListBox Grid.Row="1" ItemsSource="{Binding Alarms}" BorderThickness="0" Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <TextBlock Text="生产统计" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="SQL 数据" HorizontalAlignment="Right" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+            <UniformGrid Grid.Row="1" Columns="2" Margin="0,18,0,0">
+              <Border Background="#1C2C43" CornerRadius="7" Padding="14" Margin="0,0,8,0">
+                <StackPanel><TextBlock Text="已完成车辆" Foreground="{StaticResource TextSecondary}" /><TextBlock Text="{Binding CompletedVehicleCount}" Foreground="{StaticResource Success}" FontSize="32" FontWeight="SemiBold" Margin="0,10,0,0" /></StackPanel>
+              </Border>
+              <Border Background="#1C2C43" CornerRadius="7" Padding="14">
+                <StackPanel><TextBlock Text="未完成车辆" Foreground="{StaticResource TextSecondary}" /><TextBlock Text="{Binding PendingVehicleCount}" Foreground="#F5B942" FontSize="32" FontWeight="SemiBold" Margin="0,10,0,0" /></StackPanel>
+              </Border>
+            </UniformGrid>
+          </Grid>
+        </Border>
+        <Border Grid.Row="1" Style="{StaticResource Panel}" Margin="0,14,0,0">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+            <TextBlock Text="生产记录查询" FontSize="18" FontWeight="SemiBold" />
+            <Grid Grid.Row="1" Margin="0,16,0,8">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="80" /><ColumnDefinition Width="70" /></Grid.ColumnDefinitions>
+              <TextBlock Text="车号" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+              <TextBlock Grid.Column="1" Text="状态" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+              <TextBlock Grid.Column="2" Text="时间" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+            </Grid>
+            <ListBox Grid.Row="2" ItemsSource="{Binding DatabaseRecords}" Background="Transparent" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
               <ListBox.ItemTemplate>
                 <DataTemplate>
-                  <Border BorderBrush="#2A405D" BorderThickness="0,0,0,1" Padding="0,10">
-                    <StackPanel>
-                      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
-                      <TextBlock Text="{Binding Time}" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,0" />
-                    </StackPanel>
+                  <Border BorderBrush="#2A405D" BorderThickness="0,0,0,1" Padding="0,12">
+                    <Grid>
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="80" /><ColumnDefinition Width="70" /></Grid.ColumnDefinitions>
+                      <TextBlock Text="{Binding VehicleNumber}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Status}" Foreground="{Binding StatusBrush}" />
+                      <TextBlock Grid.Column="2" Text="{Binding RecordTime}" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+                    </Grid>
                   </Border>
                 </DataTemplate>
               </ListBox.ItemTemplate>
             </ListBox>
-          </Grid>
-        </Border>
-        <Border Grid.Row="1" Style="{StaticResource Panel}">
-          <Grid>
-            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
-            <TextBlock Text="温度趋势（模拟）" FontSize="17" FontWeight="SemiBold" />
-            <Viewbox Grid.Row="1" Stretch="Fill" Margin="0,12,0,0">
-              <Canvas Width="250" Height="105">
-                <Line X1="0" X2="250" Y1="88" Y2="88" Stroke="#38506E" StrokeThickness="1" />
-                <Polyline Points="{Binding SelectedPlc.TrendPoints}" Stroke="{StaticResource Primary}" StrokeThickness="3" StrokeLineJoin="Round" />
-              </Canvas>
-            </Viewbox>
           </Grid>
         </Border>
       </Grid>
