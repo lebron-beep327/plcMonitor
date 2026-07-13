@@ -62,5 +62,10 @@
         </Setter.Value>
       </Setter>
     </Style>
+
+    <Style TargetType="{x:Type ListViewItem}">
+      <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
   </Application.Resources>
 </Application>
