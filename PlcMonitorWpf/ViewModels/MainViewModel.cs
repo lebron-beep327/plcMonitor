@@ -35,6 +35,25 @@ public sealed class MainViewModel : ObservableObject
             new("PLC-04 通讯中断，请检查网线或电源。"),
             new("PLC-01 运行正常。")
         };
+        PlcSignals = new ObservableCollection<SignalItem>
+        {
+            new("加速允许", "PLC 开关量", "ON", true),
+            new("减速允许", "PLC 开关量", "OFF", false),
+            new("运行速度", "PLC 模拟量", "18.6 m/min", true),
+            new("系统压力", "PLC 模拟量", "0.42 MPa", true)
+        };
+        SqlChartBars = new ObservableCollection<ChartBar>
+        {
+            new("08:00", "12", 48), new("09:00", "18", 72), new("10:00", "15", 60),
+            new("11:00", "23", 96), new("12:00", "20", 82)
+        };
+        DatabaseRecords = new ObservableCollection<ProductionRecord>
+        {
+            new("TR-20260712-001", "作业中", "18:42", false),
+            new("TR-20260712-000", "已完成", "18:31", true),
+            new("TR-20260711-092", "已完成", "17:58", true),
+            new("TR-20260711-091", "已完成", "17:24", true)
+        };
 
         ToggleRunCommand = new RelayCommand(_ => ToggleRun());
         ResetAlarmCommand = new RelayCommand(_ => ResetAlarm());
@@ -47,6 +66,9 @@ public sealed class MainViewModel : ObservableObject
 
     public ObservableCollection<PlcDevice> PlcDevices { get; }
     public ObservableCollection<AlarmEntry> Alarms { get; }
+    public ObservableCollection<SignalItem> PlcSignals { get; }
+    public ObservableCollection<ChartBar> SqlChartBars { get; }
+    public ObservableCollection<ProductionRecord> DatabaseRecords { get; }
     public ICommand ToggleRunCommand { get; }
     public ICommand ResetAlarmCommand { get; }
     public ICommand SavePlcIpCommand { get; }
@@ -61,6 +83,11 @@ public sealed class MainViewModel : ObservableObject
 
     public string CurrentTime { get => _currentTime; private set => SetProperty(ref _currentTime, value); }
     public string CameraIp { get => _cameraIp; set => SetProperty(ref _cameraIp, value); }
+    public string CurrentVehicleNumber => "TR-20260712-001";
+    public string CurrentWorkStatus => "装载中";
+    public string EquipmentStatus => "运行正常";
+    public string CompletedVehicleCount => "128";
+    public string PendingVehicleCount => "6";
 
     private void RefreshSimulation()
     {
@@ -72,6 +99,8 @@ public sealed class MainViewModel : ObservableObject
             plc.LastUpdated = DateTime.Now.ToString("HH:mm:ss");
             plc.AddTemperatureSample(plc.Temperature);
         }
+        // 后续接入 PLC 后，在此处用实际 Tag 数据更新 PlcSignals。
+        PlcSignals[2].Value = $"{15 + _random.NextDouble() * 6:F1} m/min";
     }
 
     private void ToggleRun()
